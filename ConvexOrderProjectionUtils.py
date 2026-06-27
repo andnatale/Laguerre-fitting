@@ -5,6 +5,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 from scipy.sparse.linalg import spsolve
 from scipy.sparse import triu, csr_matrix
+from IPython.display import clear_output
 
 
 def cluster(X,masses = None,tol=1e-6):
@@ -31,7 +32,7 @@ def cluster(X,masses = None,tol=1e-6):
     return Xcluster, masses, cluster_map_sparse+0.0
 
 
-def frank_wolfe(y,x0,lmo, dot_product, tolerance, t_max= 100 ):
+def frank_wolfe(y,x0,lmo, dot_product, tolerance, t_max= 100):
     """
     Frank Wolfe algorithm with away step for the minimization of |y-x|^2/2 with y in A
     
@@ -55,9 +56,7 @@ def frank_wolfe(y,x0,lmo, dot_product, tolerance, t_max= 100 ):
         dtFW = st - xt
         
         FWgap = dot_product(-(xt-y),dtFW)
-        
-        print('Frank-Wolfe gap : ', FWgap )
-        
+                
         if dot_product(-(xt-y),dtFW) < tolerance: 
             print ("Success")
             break
@@ -70,11 +69,12 @@ def frank_wolfe(y,x0,lmo, dot_product, tolerance, t_max= 100 ):
    
         xt_history.append(xt)   
         fun_history.append(dot_product(xt-y,xt-y)/2)
-        print('\riteration ',t, ', function value ', fun_history[-1], end="", flush=True) 
-        
+
+        clear_output(wait = True)
+        print(f"Iter {t} | f = {fun_history[-1]:.6e} | FW gap = {FWgap:.6e}")
     return xt_history, fun_history
 
-def get_centroids(domain,X,masses, rescale = True, R0 = 1.):
+def get_centroids(domain,X,masses, rescale = True, R0 = 1., verbosity=0):
     
     if rescale : 
         # fit data in unit box
@@ -83,18 +83,18 @@ def get_centroids(domain,X,masses, rescale = True, R0 = 1.):
     
 
     ot = OptimalTransport(domain=domain, positions=  X, masses=masses,
-                          weights=np.zeros(len(masses)), verbosity=1,linear_solver = 'Scipy')
+                          weights=np.zeros(len(masses)), verbosity=verbosity,linear_solver = 'Scipy')
     ot.adjust_weights()
     errorot = np.linalg.norm(ot.pd.integrals()-masses)
         
         
-    print('OT error',errorot)
+    #print('OT error',errorot)
       
     return ot.get_centroids()
 
 def convex_order_projection_frank_wolfe(domain, Y, X0, R0=1., masses = None,  niter= 600, tol =1e-5):
     """
-    Solves Convex order projection via Frank Wolfe with away step
+    Solves Convex order projection via Frank Wolfe 
     Y : data
     X0 : initial point
     """ 
