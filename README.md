@@ -6,4 +6,8 @@ D. Bourne, T. Gallouët, Q. Mérigot, A. Natale. [*"Semi-discrete convex order a
 
 ## Dependencies
 
-The dependencies to run the code can be found in `requirements.txt`. In particular, [pysdot](https://pypi.org/project/pysdot/) was used to compute the Laguerre tessellation defined via the regularized energy driving the particle dynamics.
+The dependencies to run the code can be found in `requirements.txt`. In particular, [pysdot](https://pypi.org/project/pysdot/) as semi-discrete optimal transport solver.
+
+```
+    $ pip install pysdot
+```
